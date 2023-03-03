@@ -1,4 +1,4 @@
-const { StaveNote } = Vex.Flow;
+const { StaveNote, BarNote } = Vex.Flow;
 // list of valid notes
 const notesList = [
   "C",
@@ -40,7 +40,7 @@ export function genNoteSequence(sequenceLen, max = false, duration = "") {
   return noteSeq;
 }
 
-export function genBar(random = true, durationType = 0) {
+export function genBarSequence(random = true, durationType = 0) {
   let duration = "";
   if (random) {
     const rnd = randomInt(0, 4);
@@ -49,7 +49,9 @@ export function genBar(random = true, durationType = 0) {
     dur = barDurationList[durationtype];
   }
 
-  return genNoteSequence(duration.length, false, duration);
+  let bar = genNoteSequence(duration.length, false, duration);
+  bar.push("barNote");
+  return bar;
 }
 
 // const notes = [
@@ -84,15 +86,19 @@ export function genBarNotes(num_bars = 1) {
   let notes = [];
   let noteSeq = [];
   for (let i = 0; i < num_bars; i++) {
-    noteSeq.push(...genBar());
+    noteSeq.push(...genBarSequence());
   }
   noteSeq.forEach((note) => {
-    const name = note.name;
-    const pitch = note.pitch;
-    const duration = note.duration;
-    notes.push(
-      new StaveNote({ keys: [`${name}/${pitch}`], duration: `${duration}` })
-    );
+    if (note == "barNote") {
+      notes.push(new BarNote());
+    } else {
+      const name = note.name;
+      const pitch = note.pitch;
+      const duration = note.duration;
+      notes.push(
+        new StaveNote({ keys: [`${name}/${pitch}`], duration: `${duration}` })
+      );
+    }
   });
   return notes;
 }
