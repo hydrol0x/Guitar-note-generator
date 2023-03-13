@@ -1,4 +1,4 @@
-const { StaveNote, BarNote } = Vex.Flow;
+const { Stave, StaveNote, BarNote, Voice, Formatter } = Vex.Flow;
 // list of valid notes
 const notesList = [
   "C",
@@ -23,7 +23,7 @@ function randomInt(min, max) {
   max = Math.floor(max);
   return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
 }
-export function genNoteSequence(sequenceLen, max = false, duration = "") {
+function genNoteSequence(sequenceLen, max = false, duration = "") {
   // if max  E0-B5, otherwise  E0-A2
   let noteSeq = [];
   for (let i = 0; i < sequenceLen; i++) {
@@ -40,7 +40,7 @@ export function genNoteSequence(sequenceLen, max = false, duration = "") {
   return noteSeq;
 }
 
-export function genBarSequence(random = true, durationType = 0) {
+function genBarSequence(random = true, durationType = 0) {
   let duration = "";
   if (random) {
     const rnd = randomInt(0, 4);
@@ -50,24 +50,8 @@ export function genBarSequence(random = true, durationType = 0) {
   }
 
   let bar = genNoteSequence(duration.length, false, duration);
-  bar.push("barNote");
   return bar;
 }
-
-// const notes = [
-//   // A quarter-note C.
-//   new StaveNote({ keys: ["c/4"], duration: "q" }),
-
-//   // A quarter-note D.
-//   new StaveNote({ keys: ["d/4"], duration: "q" }),
-
-//   // A quarter-note rest. Note that the key (b/4) specifies the vertical
-//   // position of the rest.
-//   new StaveNote({ keys: ["b/4"], duration: "qr" }),
-
-//   // A C-Major chord.
-//   new StaveNote({ keys: ["c/4", "e/4", "g/4"], duration: "q" }),
-// ];
 
 export function genNotes(noteSeq) {
   let notes = [];
@@ -84,21 +68,59 @@ export function genNotes(noteSeq) {
 
 export function genBarNotes(num_bars = 1) {
   let notes = [];
-  let noteSeq = [];
+  let bars = [];
   for (let i = 0; i < num_bars; i++) {
-    noteSeq.push(...genBarSequence());
+    bars.push(genBarSequence());
   }
-  noteSeq.forEach((note) => {
-    if (note == "barNote") {
-      notes.push(new BarNote());
-    } else {
+  bars.forEach((bar) => {
+    let currentStaveNoteBar = [];
+    bar.forEach((note) => {
       const name = note.name;
       const pitch = note.pitch;
       const duration = note.duration;
-      notes.push(
+      currentStaveNoteBar.push(
         new StaveNote({ keys: [`${name}/${pitch}`], duration: `${duration}` })
       );
-    }
+    });
+    notes.push(currentStaveNoteBar);
   });
   return notes;
+}
+export function genBarStave(context, x, y, width, bars) {
+  console.log(bars);
+  for (let i = 0; i < bars.length; i++) {
+    const bar = bars[i];
+    console.log(`bar ${i + 1}`);
+
+    if (i === 0) {
+      x = 0;
+      y = 0;
+      console.log(`origin pos = ${x},${y}`);
+    } else if ((i + 1) % 2 === 0) {
+      x = width;
+      console.log(`shifted right; pos = ${x},${y}`);
+    } else {
+      y += 150;
+      x = 0;
+      console.log(`shifted down; pos = ${x},${y}`);
+    }
+    const stave = new Stave(x, y, width);
+    if (i == 0) {
+      stave.addClef("treble").addTimeSignature("4/4"); // only add cleff and t. sig for first measure
+    }
+    stave.setContext(context).draw();
+    const voice = new Voice({
+      num_beats: 4,
+      beat_value: 4,
+      resolution: Vex.Flow.RESOLUTION,
+    });
+    // voice.setStrict(false);
+    voice.addTickables(bar);
+    new Formatter().joinVoices([voice]).format([voice], width);
+    voice.draw(context, stave);
+  }
+
+  // Connect it to the rendering context and draw!
+
+  // Format and justify the notes to 400 pixels.
 }
