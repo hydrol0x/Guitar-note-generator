@@ -1,6 +1,15 @@
-.output {
-  /* display: flex; */
-  /* justify-content: center; */
+body {
+  padding: 0;
+  margin: 0;
+}
+
+article {
+  padding: 0;
+  margin: 0;
+}
+
+#canvas-wrapper {
+  margin-top: 2.5%;
 }
 
 .content-center {
@@ -24,10 +33,10 @@ button:hover {
   background-color: lightgray;
 }
 
-.text-center {
-  text-align: center;
+button:active {
+  background-color: gray;
 }
 
-#output {
-  padding-top: 15px;
+.text-center {
+  text-align: center;
 }
