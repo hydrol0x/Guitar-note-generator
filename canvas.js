@@ -2,14 +2,16 @@
 const { Renderer, Stave, StaveNote, Voice, Formatter, Tables } = Vex.Flow;
 import { genBarNotes, genBarStave } from "./noteGenerator.js";
 
+const div = document.getElementById("output");
+// const article = document.querySelector("article");
 const viewportHeight = window.innerHeight;
 const viewportWidth = window.innerWidth;
-const RENDERER_WIDTH = viewportWidth * 0.85; // otherwise gets slightly cut off
+const RENDERER_WIDTH = viewportWidth * 0.95; // otherwise gets slightly cut off
+const RENDERER_HEIGHT = viewportHeight * 0.55; // TODO: `unhardcode` in the future
 
-const div = document.getElementById("output");
 const renderer = new Renderer(div, Renderer.Backends.SVG);
 // Configure the rendering context.
-renderer.resize(RENDERER_WIDTH, window.innerHeight * 0.75);
+renderer.resize(RENDERER_WIDTH, RENDERER_HEIGHT);
 const context = renderer.getContext();
 
 const clearStaff = (staff) => {
