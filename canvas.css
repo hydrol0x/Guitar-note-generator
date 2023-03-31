@@ -3,9 +3,25 @@
   /* justify-content: center; */
 }
 
+button {
+  width: 100px;
+  height: 30px;
+  border-radius: 10px;
+  background-color: white;
+  border-width: 1.5px;
+  border-color: gray;
+  border-style: solid;
+  transition: background-color 0.2s;
+}
+
+button:hover {
+  background-color: lightgray;
+}
+
 .text-center {
   text-align: center;
 }
+
 svg {
   padding-top: 50px;
 }
